@@ -19,14 +19,6 @@ class Drink(db.Model):
     def __repr__(self):
         return f"{self.name} - {self.description}"
 
-@app.route('/')
-def index():
-    return 'Hello'
-
-@app.route('/drinks')
-def get_drinks():
-    return {"drinks":"drink data"}
-
 def add_to_db(new_name, new_desc):
     existing_drink = Drink.query.filter_by(name=new_name).first()
     if existing_drink is None:
@@ -41,7 +33,26 @@ with app.app_context():
     db.create_all()
     add_to_db("test name", "test description")
     add_to_db("soda", "very sweet")
+    add_to_db("cola", "cola cola")
+    add_to_db("sprite", "lime")
     print(Drink.query.all())
+
+@app.route('/')
+def index():
+    return 'Hello'
+
+@app.route('/drinks')
+def get_drinks():
+    drinks = Drink.query.all()
+
+    output = []
+
+    for drink in drinks:
+        drink_data = {'name': drink.name, 'description': drink.description}
+        
+        output.append(drink_data)
+
+    return {"drinks":output}
 
 if __name__ == '__main__':
     app.run(debug=True)
