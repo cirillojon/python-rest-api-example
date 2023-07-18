@@ -18,7 +18,9 @@ class Drink(db.Model):
 
     def __repr__(self):
         return f"{self.name} - {self.description}"
-
+    
+# Manually add drinks
+'''
 def add_to_db(new_name, new_desc):
     existing_drink = Drink.query.filter_by(name=new_name).first()
     if existing_drink is None:
@@ -28,6 +30,7 @@ def add_to_db(new_name, new_desc):
         print(f'Added: {drink}')
     else:
         print(f'Drink with name {new_name} already exists. Skipping.')
+'''
 
 @app.route('/')
 def index():
@@ -63,11 +66,10 @@ def add_drink():
     
 with app.app_context():
     db.create_all()
-    add_to_db("test name", "test description")
-    add_to_db("soda", "very sweet")
-    add_to_db("cola", "cola cola")
-    add_to_db("sprite", "lime")
-    print(Drink.query.all())
+    
+    # For manually adding to db #
+    # add_to_db("test name", "test description")
+    # print(Drink.query.all())
 
 if __name__ == '__main__':
     app.run(debug=True)
