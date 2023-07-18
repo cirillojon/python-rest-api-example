@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 
@@ -29,14 +29,6 @@ def add_to_db(new_name, new_desc):
     else:
         print(f'Drink with name {new_name} already exists. Skipping.')
 
-with app.app_context():
-    db.create_all()
-    add_to_db("test name", "test description")
-    add_to_db("soda", "very sweet")
-    add_to_db("cola", "cola cola")
-    add_to_db("sprite", "lime")
-    print(Drink.query.all())
-
 @app.route('/')
 def index():
     return 'Hello'
@@ -55,7 +47,27 @@ def get_drinks():
 @app.route('/drinks/<id>')
 def get_drink(id):
     drink = Drink.query.get_or_404(id)
-    return {"name": drink.name, "description": drink.description}
+    return jsonify({"name": drink.name, "description": drink.description})
+
+@app.route('/drinks', methods=['POST'])
+def add_drink():
+    drink = Drink(name=request.json['name'], description=request.json['description'])
+    existing_drink = Drink.query.filter_by(name=drink.name).first()
+    if existing_drink is None:
+        db.session.add(drink)
+        db.session.commit()
+        print(Drink.query.all())
+        return {'id': drink.id}
+    else:
+        return {'error': f"{drink.name} already Exists in db"}
+    
+with app.app_context():
+    db.create_all()
+    add_to_db("test name", "test description")
+    add_to_db("soda", "very sweet")
+    add_to_db("cola", "cola cola")
+    add_to_db("sprite", "lime")
+    print(Drink.query.all())
 
 if __name__ == '__main__':
     app.run(debug=True)
